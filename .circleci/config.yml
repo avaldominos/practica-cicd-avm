@@ -1,0 +1,17 @@
+version: 2.1
+
+jobs:
+  test:
+    working_directory: ~/project
+    docker:
+      - image: cimg/python:3.9.20
+    steps:
+      - checkout
+      - run: sudo apt install make
+      - run: make test
+
+
+workflows:
+  test-deploy:
+    jobs:
+      - test
