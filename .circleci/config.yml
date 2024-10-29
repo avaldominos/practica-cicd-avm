@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  sonarcloud: sonarsource/sonarcloud@2.0.0
+
 jobs:
   test:
     working_directory: ~/project
@@ -13,9 +16,12 @@ jobs:
           command: make test-report
       - store_test_results:
           path: test-results.xml
-
-
+      - persist_to_workspace:
+          root: ~/project
+          paths: .
+      - sonarcloud/scan
 workflows:
   test-deploy:
     jobs:
-      - test
+      - test:
+          context: SonarCloud
