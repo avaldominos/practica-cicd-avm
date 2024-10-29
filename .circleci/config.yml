@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   sonarcloud: sonarsource/sonarcloud@2.0.0
+  ggshield: gitguardian/ggshield@volatile
 
 jobs:
   test:
@@ -20,9 +21,14 @@ jobs:
       - persist_to_workspace:
           root: ~/project
           paths: .
-      
 workflows:
   test-deploy:
     jobs:
       - test:
           context: SonarCloud
+  main:
+    jobs:
+      - ggshield/scan:
+          name: ggshield-scan
+          base_revision: << pipeline.git.base_revision >>
+          revision: <<pipeline.git.revision>>          
