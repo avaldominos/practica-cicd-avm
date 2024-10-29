@@ -30,5 +30,6 @@ workflows:
     jobs:
       - ggshield/scan:
           name: ggshield-scan
+          context: GitGuardian
           base_revision: << pipeline.git.base_revision >>
           revision: <<pipeline.git.revision>>          
