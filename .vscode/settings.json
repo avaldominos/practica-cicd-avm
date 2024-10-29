@@ -1,0 +1,7 @@
+{
+    "circleci.filters.branchFilter": "allBranches",
+    "circleci.persistedProjectSelection": [
+        "gh/avaldominos/practica-cicd-avm"
+    ],
+    "circleci.filters.myPipelinesOnly": true
+}
