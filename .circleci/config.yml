@@ -16,10 +16,11 @@ jobs:
           command: make test-report
       - store_test_results:
           path: test-results.xml
+      - sonarcloud/scan
       - persist_to_workspace:
           root: ~/project
           paths: .
-      - sonarcloud/scan
+      
 workflows:
   test-deploy:
     jobs:
