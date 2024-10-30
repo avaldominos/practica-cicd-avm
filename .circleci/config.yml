@@ -26,7 +26,7 @@ jobs:
       - persist_to_workspace:
           root: ~/project
           paths: .
-  deploy:
+  build_push:
     docker:
       - image: cimg/base:2024.10
     steps:
@@ -42,18 +42,17 @@ jobs:
 
 
 workflows:
-  scan:
+
+  test-scan-build:
     jobs:
+      - test:
+          context: SonarCloud
       - ggshield/scan:
           name: ggshield-scan
           context: GitGuardian
           base_revision: << pipeline.git.base_revision >>
           revision: <<pipeline.git.revision>>
-  test-deploy:
-    jobs:
-      - test:
-          context: SonarCloud
-      - deploy:
+      - build_push:
           requires:
             - test
           filters:
