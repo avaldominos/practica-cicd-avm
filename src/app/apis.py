@@ -18,9 +18,11 @@ def api_process():
         apidata["processes"] = []
         for proc in psutil.process_iter():
             try:
-                # pinfo = proc.as_dict(attrs=['pid', 'name', 'num_handles', 'num_threads', 'memory_percent', 'cpu_times'])
+                # pinfo = proc.as_dict(attrs=['pid', 'name',\
+                #  'num_handles', 'num_threads', 'memory_percent', 'cpu_times'])
                 pinfo = proc.as_dict(
-                    attrs=["pid", "name", "memory_percent", "num_threads", "cpu_times"]
+                    attrs=["pid", "name", "memory_percent",\
+                            "num_threads", "cpu_times"]
                 )
             except psutil.NoSuchProcess:
                 pass
@@ -45,11 +47,13 @@ def api_monitor():
     try:
         netio = psutil.net_io_counters()
         apidata["net_sent"] = (
-            0 if olddata["net_sent"] == 0 else netio.bytes_sent - olddata["net_sent"]
+            0 if olddata["net_sent"] == 0 else\
+                  netio.bytes_sent - olddata["net_sent"]
         )
         olddata["net_sent"] = netio.bytes_sent
         apidata["net_recv"] = (
-            0 if olddata["net_recv"] == 0 else netio.bytes_recv - olddata["net_recv"]
+            0 if olddata["net_recv"] == 0 else\
+                  netio.bytes_recv - olddata["net_recv"]
         )
         olddata["net_recv"] = netio.bytes_recv
     except Exception:
@@ -65,7 +69,8 @@ def api_monitor():
         )
         olddata["disk_write"] = diskio.write_bytes
         apidata["disk_read"] = (
-            0 if olddata["disk_read"] == 0 else diskio.read_bytes - olddata["disk_read"]
+            0 if olddata["disk_read"] == 0 else\
+                  diskio.read_bytes - olddata["disk_read"]
         )
         olddata["disk_read"] = diskio.read_bytes
     except Exception:
