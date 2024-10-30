@@ -18,8 +18,8 @@ def api_process():
         apidata["processes"] = []
         for proc in psutil.process_iter():
             try:
-                # pinfo = proc.as_dict(attrs=['pid', 'name',\
-                #  'num_handles', 'num_threads', 'memory_percent', 'cpu_times'])
+                # pinfo = proc.as_dict(attrs=['pid', 'name', 'num_handles',\
+                #  'num_threads', 'memory_percent', 'cpu_times'])
                 pinfo = proc.as_dict(
                     attrs=["pid", "name", "memory_percent",\
                             "num_threads", "cpu_times"]
