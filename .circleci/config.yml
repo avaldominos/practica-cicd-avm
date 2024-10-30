@@ -22,14 +22,14 @@ jobs:
           root: ~/project
           paths: .
 workflows:
-  test-deploy:
+  test:
     jobs:
       - test:
           context: SonarCloud
-  main:
+  scan:
     jobs:
       - ggshield/scan:
           name: ggshield-scan
           context: GitGuardian
           base_revision: << pipeline.git.base_revision >>
-          revision: <<pipeline.git.revision>>          
+          revision: <<pipeline.git.revision>>  
