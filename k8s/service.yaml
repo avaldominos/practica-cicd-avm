@@ -1,0 +1,32 @@
+# python-app-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-app-service
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-app-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: python-app-127-0-0-1.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: python-app-service
+                port:
+                  number: 80

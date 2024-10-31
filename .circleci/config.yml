@@ -41,12 +41,25 @@ jobs:
           command: |
             docker build -t $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM} .
             docker push $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
+      - run:
+          name: Update Kubernetes Manifest with New Image Tag
+          command: |
+            # Update the image tag in the Kubernetes manifest file (/k8s/deployment.yaml)
+            sed -i "s|image: avaldominos/python-app:.*|image: avaldominos/python-app:${CIRCLE_BUILD_NUM}|" k8s/deployment.yaml
+      - run:
+          name: Commit and Push Updated Manifest
+          command: |
+            git config --global user.email "avaldominos@alsyro.es"
+            git config --global user.name "avaldominos"
+            git add k8s/deployment.yaml
+            git commit -m "Update image tag to ${CIRCLE_BUILD_NUM}"
+            git push origin ${CIRCLE_BRANCH}
 
 
 
 workflows:
 
-  test-scan-build_push:
+  test_scan_build_push:
     jobs:
       - test:
           context: SonarCloud
@@ -60,7 +73,4 @@ workflows:
             - test
           filters:
             branches:
-              only: main        
-
-
-
+              only: main      
