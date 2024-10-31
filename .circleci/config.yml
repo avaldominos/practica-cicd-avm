@@ -26,24 +26,27 @@ jobs:
       - persist_to_workspace:
           root: ~/project
           paths: .
-  build_push:
+  build_and_push:
     docker:
       - image: cimg/base:2024.10
     steps:
       - checkout
       - setup_remote_docker
       - run:
-          name: Build and push to Docker Hub
+          name: Login to Docker Hub
           command: |
-            docker build -t $DOCKER_HUB_USER_ID/$IMAGE_NAME:latest .
             echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER_ID" --password-stdin
-            docker push $DOCKER_HUB_USER_ID/$IMAGE_NAME:latest
+      - run:
+          name: Build and push Docker Image to Docker Hub
+          command: |
+            docker build -t $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM} .
+            docker push $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
 
 
 
 workflows:
 
-  test-scan-build:
+  test-scan-build_push:
     jobs:
       - test:
           context: SonarCloud
@@ -52,7 +55,7 @@ workflows:
           context: GitGuardian
           base_revision: << pipeline.git.base_revision >>
           revision: <<pipeline.git.revision>>
-      - build_push:
+      - build_and_push:
           requires:
             - test
           filters:
