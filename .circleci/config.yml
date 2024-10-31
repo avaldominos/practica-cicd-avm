@@ -53,8 +53,10 @@ jobs:
             git config --global user.name "avaldominos"
             git add k8s/deployment.yaml
             git commit -m "Update image tag to ${CIRCLE_BUILD_NUM}"
-            git push origin ${CIRCLE_BRANCH}
 
+            # Configure Git to use the Personal Access Token for authentication
+            git remote set-url origin https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git
+            git push origin ${CIRCLE_BRANCH}
 
 
 workflows:
