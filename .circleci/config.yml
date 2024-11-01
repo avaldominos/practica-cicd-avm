@@ -48,6 +48,8 @@ jobs:
           command: |
             # Explicitly set the tar file path with resolved environment variables
             mkdir -p docker_images
+            cd docker_images
+            pwd
             docker save -o ~/project/docker_images/$DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM} $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
       - store_artifacts:
           path: ~/project/docker_images/$DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
