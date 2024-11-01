@@ -27,7 +27,7 @@ lint: venv  ## 🔎 Lint & format, will not fix but sets exit code on error
 
 lint-fix: venv  ## 📜 Lint & format, will try to fix errors and modify code
 	. $(SRC_DIR)/.venv/bin/activate \
-	&& black $(SRC_DIR)
+	&& black --check --diff $(SRC_DIR)
 
 image:  ## 🔨 Build container image from Dockerfile 
 	docker build . --file build/Dockerfile \
