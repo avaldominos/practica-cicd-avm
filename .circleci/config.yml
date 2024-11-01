@@ -52,6 +52,7 @@ jobs:
             # Create the direcory and save the Docker image
             mkdir -p ~/project/docker_images
             docker save -o "$IMAGE_TAR_PATH" $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
+            ls ~/project/docker_images
 
       - store_artifacts:
           path: ~/project/docker_images/${DOCKER_HUB_USER_ID}_${IMAGE_NAME}_${CIRCLE_BUILD_NUM}.tar
