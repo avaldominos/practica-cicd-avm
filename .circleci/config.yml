@@ -31,7 +31,7 @@ jobs:
           path: test-results.xml
       - save_cache:
           paths:
-            - /src/.venv  # Cache the entire virtual environment
+            - ~/project/src/.venv  # Cache the entire virtual environment
           key: v1-venv-{{ checksum "src/requirements.txt" }}
       - sonarcloud/scan
 
