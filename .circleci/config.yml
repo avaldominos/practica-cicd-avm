@@ -32,7 +32,7 @@ jobs:
       - save_cache:
           paths:
             - /src/.venv  # Cache the entire virtual environment
-          key: v1-venv-{{ checksum "requirements.txt" }}
+          key: v1-venv-{{ checksum "src/requirements.txt" }}
       - sonarcloud/scan
 
       - persist_to_workspace:
