@@ -27,10 +27,12 @@ jobs:
           root: ~/project
           paths: .
   build_and_push:
+    working_directory: ~/project  # Use the same working directory as in the `test` job
     docker:
       - image: cimg/base:2024.10
     steps:
-      - checkout
+      - attach_workspace:
+          at: ~/project  # Attach the workspace at the same path as `test`checkout
       - setup_remote_docker
       - run:
           name: Login to Docker Hub
@@ -66,15 +68,17 @@ jobs:
 
 workflows:
 
-  test_scan_build_push:
+  scan_test_build_push:
     jobs:
-      - test:
-          context: SonarCloud
       - ggshield/scan:
           name: ggshield-scan
           context: GitGuardian
           base_revision: << pipeline.git.base_revision >>
           revision: <<pipeline.git.revision>>
+      - test:
+          context: SonarCloud
+          requires:
+            - ggshield/scan
       - build_and_push:
           requires:
             - test
