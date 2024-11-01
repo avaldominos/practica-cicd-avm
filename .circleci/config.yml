@@ -15,8 +15,8 @@ jobs:
           name: Install make
           command: sudo apt install make
       - run: 
-          name: Run make lint
-          command: make lint
+          name: Run make lint-fix
+          command: make lint-fix
       - run: 
           name: Run make test
           command: make test-report
