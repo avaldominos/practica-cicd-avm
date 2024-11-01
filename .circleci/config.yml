@@ -11,12 +11,13 @@ jobs:
       - image: cimg/python:3.9.20
     steps:
       - checkout
+      # Restore cached virtual environment if it exists
       - restore_cache:
           keys:
-            # Restore the exact cache for the dependencies, if it exists
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # Fallback to a cache with just the version if exact dependencies cache isn’t found
-            - v1-dependencies-
+            # Use a cache key that depends on `requirements.txt` changes
+            - v1-venv-{{ checksum "src/requirements.txt" }}
+            # Fallback to the last saved cache if exact match isn’t found
+            - v1-venv-
       - run:
           name: Install make
           command: sudo apt install -y make
@@ -28,11 +29,12 @@ jobs:
           command: make test-report
       - store_test_results:
           path: test-results.xml
-      - sonarcloud/scan
       - save_cache:
           paths:
-            - ~/.cache/pip
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+            - /src/.venv  # Cache the entire virtual environment
+          key: v1-venv-{{ checksum "requirements.txt" }}
+      - sonarcloud/scan
+
       - persist_to_workspace:
           root: ~/project
           paths: .
