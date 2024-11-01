@@ -1,114 +1,146 @@
 version: 2.1
 
+# Import orbs for SonarCloud and GitGuardian
 orbs:
   sonarcloud: sonarsource/sonarcloud@2.0.0
   ggshield: gitguardian/ggshield@volatile
 
 jobs:
+  # Define the `test` job for running tests and scans
   test:
-    working_directory: ~/project
+    working_directory: ~/project  # Set the working directory for this job
     docker:
-      - image: cimg/python:3.9.20
+      - image: cimg/python:3.9.20  # Use a Python Docker image for testing
     steps:
-      - checkout
-      # Restore cached virtual environment if it exists
+      - checkout  # Check out the project code
+
+      # Restore cached virtual environment if it exists to speed up dependencies installation
       - restore_cache:
           keys:
-            # Use a cache key that depends on `requirements.txt` changes
+            # Primary cache key based on `requirements.txt` checksum; updates if dependencies change
             - v1-venv-{{ checksum "src/requirements.txt" }}
-            # Fallback to the last saved cache if exact match isn’t found
+            # Fallback cache key to use a general cache if the primary key is missing
             - v1-venv-
+      
+      # Install `make` to use Makefile commands
       - run:
-          name: Install make
+          name: Install make 
           command: sudo apt install -y make
+
+      # Run linting and auto-fix any issues using Makefile command
       - run: 
-          name: Run make lint-fix
+          name: Run make lint-fix  
           command: make lint-fix
+
+      # Run tests and generate a report
       - run: 
-          name: Run make test
+          name: Run make test  
           command: make test-report
+
+      # Store the test results so they are accessible in CircleCI
       - store_test_results:
-          path: test-results.xml
+          path: test-results.xml  
+
+      # Save the `.venv` virtual environment to cache to avoid reinstalling dependencies in future builds
       - save_cache:
           paths:
             - ~/project/src/.venv  # Cache the entire virtual environment
           key: v1-venv-{{ checksum "src/requirements.txt" }}
-      - sonarcloud/scan
 
+      # Run SonarCloud scan for code quality analysis
+      - sonarcloud/scan  
+
+      # Persist the entire project to a workspace for use in the next job
       - persist_to_workspace:
           root: ~/project
           paths: .
+
+  # Define the `build_and_push` job to build the Docker image and push it to Docker Hub
   build_and_push:
     working_directory: ~/project  # Use the same working directory as in the `test` job
     docker:
-      - image: cimg/base:2024.10
+      - image: cimg/base:2024.10  # Use a base Docker image with general-purpose tools
     steps:
+      # Attach the workspace from the `test` job
       - attach_workspace:
-          at: ~/project  # Attach the workspace at the same path as `test`checkout
-      - setup_remote_docker
+          at: ~/project 
+
+      - setup_remote_docker  # Enable Docker for building and pushing images
+
+      # Log in to Docker Hub using credentials from environment variables
       - run:
-          name: Login to Docker Hub
+          name: Login to Docker Hub  
           command: |
             echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER_ID" --password-stdin
+
+      # Build and push the Docker image to Docker Hub
       - run:
-          name: Build and push Docker Image to Docker Hub
+          name: Build and push Docker Image to Docker Hub  
           command: |
             docker build -t $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM} .
             docker push $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
+
+      # Save Docker image as a .tar file for storage as an artifact
       - run:
-          name: Save Docker Image as Tar File
+          name: Save Docker Image as Tar File  
           command: |
-            # Define a file name without colons
+            # Define a file name for the .tar file without using colons
             IMAGE_TAR_PATH=~/project/docker_images/${DOCKER_HUB_USER_ID}_${IMAGE_NAME}_${CIRCLE_BUILD_NUM}.tar
-            
-            # Create the direcory and save the Docker image
+
+            # Create the directory to store the Docker image and save it as a .tar file
             mkdir -p ~/project/docker_images
             docker save -o "$IMAGE_TAR_PATH" $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
-            ls ~/project/docker_images
+            ls ~/project/docker_images  # List the contents of the image directory for verification
 
+      # Store the Docker image as an artifact for later retrieval
       - store_artifacts:
-          path: ~/project/docker_images
+          path: ~/project/docker_images  
 
+      # Clone the Kubernetes manifest repository to update the image tag
       - run:
-          name: Clone Manifest Repository
+          name: Clone Manifest Repository  
           command: |
-            # Clone the separate manifest repository
             git clone https://${GITHUB_TOKEN}@github.com/avaldominos/practica-cicd-avm-manifest.git manifests-repo
+
+      # Update image tag in Kubernetes manifest
       - run:
-          name: Update Kubernetes Manifest with New Image Tag
+          name: Update Kubernetes Manifest with New Image Tag  
           command: |
-            # Update the image tag in the Kubernetes manifest file (/k8s/deployment.yaml)
             sed -i "s|image: avaldominos/python-app:.*|image: avaldominos/python-app:${CIRCLE_BUILD_NUM}|" manifests-repo/k8s/deployment.yaml
+
+      # Commit and push the updated manifest back to the repository
       - run:
-          name: Commit and Push Updated Manifest
+          name: Commit and Push Updated Manifest  
           command: |
             cd manifests-repo
-            git config --global user.email "avaldominos@alsyro.es"
+            git config --global user.email "avaldominos@alsyro.es"  # Configure Git user for commit
             git config --global user.name "avaldominos"
-            git add k8s/deployment.yaml
-            git commit -m "Update image tag to ${CIRCLE_BUILD_NUM}"
+            git add k8s/deployment.yaml  # Stage the updated manifest file
+            git commit -m "Update image tag to ${CIRCLE_BUILD_NUM}"  # Commit with a message
+            git push origin main  # Push changes to the `main` branch of the manifest repo
 
-            # Push changes back to the manifest repository
-            git push origin main
-
-
+# Define the workflow to run all jobs in sequence
 workflows:
 
   scan_test_build_push:
     jobs:
+      # Run GitGuardian scan as the first job in the workflow
       - ggshield/scan:
-          name: ggshield-scan
-          context: GitGuardian
-          base_revision: << pipeline.git.base_revision >>
-          revision: <<pipeline.git.revision>>
-      - test:
-          context: SonarCloud
-          requires:
-            - ggshield-scan
+          name: ggshield-scan  # Name of the GitGuardian scan job
+          context: GitGuardian  # Use GitGuardian context for authentication
+          base_revision: << pipeline.git.base_revision >>  # Set the base revision for the scan
+          revision: <<pipeline.git.revision>>  # Set the current revision for the scan
 
+      # Run `test` job after the GitGuardian scan completes
+      - test:
+          context: SonarCloud  # Use SonarCloud context for authentication
+          requires:
+            - ggshield-scan  # Require `ggshield-scan` job to complete first
+
+      # Run `build_and_push` job after `test` completes
       - build_and_push:
           requires:
-            - test
+            - test  # Require `test` job to complete before running
           filters:
             branches:
-              only: main            
+              only: main  # Only run this job on the `main` branch            
