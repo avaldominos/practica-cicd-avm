@@ -78,7 +78,8 @@ workflows:
       - test:
           context: SonarCloud
           requires:
-            - ggshield/scan
+            - ggshield-scan
+
       - build_and_push:
           requires:
             - test
