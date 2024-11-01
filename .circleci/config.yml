@@ -46,13 +46,16 @@ jobs:
       - run:
           name: Save Docker Image as Tar File
           command: |
-            # Explicitly set the tar file path with resolved environment variables
-            mkdir -p docker_images
-            cd docker_images
-            pwd
-            docker save -o $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM} $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
+            # Define a file name without colons
+            IMAGE_TAR_PATH=~/project/docker_images/${DOCKER_HUB_USER_ID}_${IMAGE_NAME}_${CIRCLE_BUILD_NUM}.tar
+            
+            # Create the direcory and save the Docker image
+            mkdir -p ~/project/docker_images
+            docker save -o "$IMAGE_TAR_PATH" $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
+
       - store_artifacts:
-          path: ~/project/docker_images/$DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
+          path: ~/project/docker_images/${DOCKER_HUB_USER_ID}_${IMAGE_NAME}_${CIRCLE_BUILD_NUM}.tar
+          destination: docker_images
       - run:
           name: Clone Manifest Repository
           command: |
