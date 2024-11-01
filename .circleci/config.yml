@@ -11,9 +11,25 @@ jobs:
       - image: cimg/python:3.9.20
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            # Restore the exact cache for the dependencies, if it exists
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            # Fallback to a cache with just the version if exact dependencies cache isn’t found
+            - v1-dependencies-
       - run:
           name: Install make
-          command: sudo apt install make
+          command: sudo apt install -y make
+      # Run dependency installation and save them to the cache
+      - run:
+          name: Install Python Dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
       - run: 
           name: Run make lint-fix
           command: make lint-fix
@@ -23,6 +39,7 @@ jobs:
       - store_test_results:
           path: test-results.xml
       - sonarcloud/scan
+
       - persist_to_workspace:
           root: ~/project
           paths: .
