@@ -42,10 +42,15 @@ jobs:
             docker build -t $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM} .
             docker push $DOCKER_HUB_USER_ID/$IMAGE_NAME:${CIRCLE_BUILD_NUM}
       - run:
+          name: Clone Manifest Repository
+          command: |
+            # Clone the separate manifest repository
+            git clone https://${GITHUB_TOKEN}@github.com/avaldominos/practica-cicd-avm-manifest.git manifests-repo
+      - run:
           name: Update Kubernetes Manifest with New Image Tag
           command: |
             # Update the image tag in the Kubernetes manifest file (/k8s/deployment.yaml)
-            sed -i "s|image: avaldominos/python-app:.*|image: avaldominos/python-app:${CIRCLE_BUILD_NUM}|" k8s/deployment.yaml
+            sed -i "s|image: avaldominos/python-app:.*|image: avaldominos/python-app:${CIRCLE_BUILD_NUM}|" manifests-repo/k8s/deployment.yaml
       - run:
           name: Commit and Push Updated Manifest
           command: |
@@ -54,9 +59,8 @@ jobs:
             git add k8s/deployment.yaml
             git commit -m "Update image tag to ${CIRCLE_BUILD_NUM}"
 
-            # Configure Git to use the Personal Access Token for authentication
-            git remote set-url origin https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git
-            git push origin ${CIRCLE_BRANCH}
+            # Push changes back to the manifest repository
+            git push origin main
 
 
 workflows:
@@ -75,4 +79,4 @@ workflows:
             - test
           filters:
             branches:
-              only: main      
+              only: main            
