@@ -54,6 +54,7 @@ jobs:
       - run:
           name: Commit and Push Updated Manifest
           command: |
+            cd manifests-repo
             git config --global user.email "avaldominos@alsyro.es"
             git config --global user.name "avaldominos"
             git add k8s/deployment.yaml
