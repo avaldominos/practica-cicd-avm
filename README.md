@@ -151,17 +151,19 @@ Los entregables solicitados en la practica se encuentran en:
 1. [El enlace al repositorio de GitHub donde se encuentra el código de la aplicación](https://github.com/avaldominos/practica-cicd-avm/tree/main/src).
 2. [El enlace al repositorio de artefactos donde se encuentra el artefacto de la aplicación](https://hub.docker.com/repository/docker/avaldominos/python-app/general).
 3. [El fichero de configuración del pipeline de CI/CD](https://github.com/avaldominos/practica-cicd-avm/blob/main/.circleci/config.yml).
-4. [Screenshots del pipeline de CI/CD](https://github.com/avaldominos/practica-cicd-avm/main/screenshots/CircleCI_Pipeline.jpg)
+4. Enlace o screenshot del pipeline de CI/CD
+    - [Enlace CircleCI](https://app.circleci.com/pipelines/github/avaldominos/practica-cicd-avm)
+    - [Screenshot CircleCI](https://github.com/avaldominos/practica-cicd-avm/blob/main/screenshots/CircleCI_Pipeline.jpg)    
 5. [Los manifestos de Kubernetes para el despliegue de la aplicación](https://github.com/avaldominos/practica-cicd-avm-manifest/tree/main).
 6. Enlace o screenshot de la aplicación desplegada.
-    - [screenshot App Desplegada en cluster Kind](https://github.com/avaldominos/practica-cicd-avm/screenshots/App.jpg)
+    - [Screenshot App Desplegada en cluster Kind](https://github.com/avaldominos/practica-cicd-avm/blob/main/screenshots/App.jpg)
 7. Enlace o screenshot del proyecto en ArgoCD.
-    - [screenshot ArgoCD](./screenshots/ArgoCD.jpg)
+    - [Screenshot ArgoCD](https://github.com/avaldominos/practica-cicd-avm/blob/main/screenshots/ArgoCD..jpg)
 8. Enlace o screenshot del proyecto en SonarCloud.
     - [Enlace SonarCloud](https://sonarcloud.io/project/overview?id=avaldominos_practica-cicd-avm)
-    - [screenshot SonarCloud](./screenshots/SonarCloud.jpg)
+    - [Screenshot SonarCloud](https://github.com/avaldominos/practica-cicd-avm/blob/main/screenshots/SonarCloud.jpg)
 9. Enlace o screenshot del proyecto en Snyk o GitGuardian.
-    - [screenshot GitGuardian](/screenshots/GitGuardian.jpg)
+    - [Screenshot GitGuardian](https://github.com/avaldominos/practica-cicd-avm/blob/main/screenshots/GitGuardian.jpg)
 10. Enlace a un vídeo de Youtube donde se explique la práctica.
 
 ## 6. Recursos
