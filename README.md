@@ -164,7 +164,8 @@ Los entregables solicitados en la practica se encuentran en:
     - [Screenshot SonarCloud](https://github.com/avaldominos/practica-cicd-avm/blob/main/screenshots/SonarCloud.jpg)
 9. Enlace o screenshot del proyecto en Snyk o GitGuardian.
     - [Screenshot GitGuardian](https://github.com/avaldominos/practica-cicd-avm/blob/main/screenshots/GitGuardian.jpg)
-10. Enlace a un vídeo de Youtube donde se explique la práctica.
+10. Enlace a un vídeo donde se explique la práctica.
+    - [Video CI/CD](./video/cicd-video.mp4).
 
 ## 6. Recursos
 
